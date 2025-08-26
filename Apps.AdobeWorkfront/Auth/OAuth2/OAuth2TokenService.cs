@@ -27,7 +27,7 @@ public class OAuth2TokenService(InvocationContext invocationContext)
             { "refresh_token", values[CredNames.RefreshToken] },
         };
         
-        return GetToken(bodyParameters, cancellationToken);
+        return GetToken(bodyParameters, values, cancellationToken);
     }
 
     public Task<Dictionary<string, string>> RequestToken(
@@ -45,7 +45,7 @@ public class OAuth2TokenService(InvocationContext invocationContext)
             { "code", code }
         };
         
-        return GetToken(bodyParameters, cancellationToken);
+        return GetToken(bodyParameters, values, cancellationToken);
     }
 
     public Task RevokeToken(Dictionary<string, string> values)
@@ -53,38 +53,40 @@ public class OAuth2TokenService(InvocationContext invocationContext)
         throw new NotImplementedException();
     }
 
-    private async Task<Dictionary<string, string>> GetToken(Dictionary<string, string> parameters,
+    private async Task<Dictionary<string, string>> GetToken(Dictionary<string, string> bodyParameters,
+        Dictionary<string, string> values,
         CancellationToken token)
     {
-        var responseContent = await ExecuteTokenRequest(parameters, token);
+        var responseContent = await ExecuteTokenRequest(bodyParameters, values, token);
         var tokenDto = JsonConvert.DeserializeObject<TokenDto>(responseContent!)!;
-
-        var customExpiresIn = Math.Max(0, tokenDto.ExpiresIn - 10);
-        var expiresAt = DateTime.UtcNow.AddSeconds(customExpiresIn);
+        
+        var expiresAt = DateTime.UtcNow.AddSeconds(tokenDto.ExpiresIn);
         var expiresAtStr = expiresAt.ToString("o", CultureInfo.InvariantCulture);
         
         return new Dictionary<string, string>
         {
             { CredNames.AccessToken, tokenDto.AccessToken },
-            { CredNames.RefreshToken, tokenDto.RefreshToken ?? string.Empty },
+            { CredNames.RefreshToken, tokenDto.RefreshToken },
             { CredNames.ExpiresAt, expiresAtStr },
-            { "token_type", tokenDto.TokenType ?? string.Empty }
+            { "token_type", tokenDto.TokenType }
         };
     }
 
-    private async Task<string> ExecuteTokenRequest(Dictionary<string, string> parameters,
+    private async Task<string> ExecuteTokenRequest(Dictionary<string, string> bodyParameters,
+        Dictionary<string, string> values,
         CancellationToken cancellationToken)
     {
         using var client = new HttpClient();
-        using var content = new FormUrlEncodedContent(parameters);
+        using var content = new FormUrlEncodedContent(bodyParameters);
         
-        var tokenUrl = GetTokenUrl(parameters);
+        var tokenUrl = GetTokenUrl(values);
         using var response = await client.PostAsync(tokenUrl, content, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new Exception($"Error requesting token: {response.StatusCode} - {errorContent}");
+            var tokenErrorDto = JsonConvert.DeserializeObject<TokenErrorDto>(errorContent)!;
+            throw new Exception(tokenErrorDto.ToString());
         }
 
         return await response.Content.ReadAsStringAsync(cancellationToken);

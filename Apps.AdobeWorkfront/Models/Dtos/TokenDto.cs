@@ -15,7 +15,4 @@ public class TokenDto
     
     [JsonProperty("expires_in")]
     public int ExpiresIn { get; set; }
-    
-    [JsonProperty("wid")]
-    public string Wid { get; set; } = string.Empty;
 }
