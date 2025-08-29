@@ -1,6 +1,8 @@
 {
   "ConnectionDefinition": {
-    "token": ""
+    "baseUrl": "",
+    "access_token": "",
+    "token_type": "sessionID"
   },
   "TestFolder": "TestFiles"
 }

@@ -1,5 +1,6 @@
 using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Tests.AdobeWorkfront.Base;
 

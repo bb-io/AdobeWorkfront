@@ -1,5 +1,6 @@
 using Apps.AdobeWorkfront.Connections;
 using Blackbird.Applications.Sdk.Common.Authentication;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.AdobeWorkfront.Base;
 
 namespace Tests.AdobeWorkfront;
@@ -10,7 +11,7 @@ public class ConnectionValidatorTests : TestBase
     [TestMethod]
     public async Task ValidateConnection_ValidData_ShouldBeSuccessful()
     {
-        var validator = new ConnectionValidator();
+        var validator = new FConnectionValidator();
 
         var result = await validator.ValidateConnection(Creds, CancellationToken.None);
         Console.WriteLine(result.Message);
@@ -20,7 +21,7 @@ public class ConnectionValidatorTests : TestBase
     [TestMethod]
     public async Task ValidateConnection_InvalidData_ShouldFail()
     {
-        var validator = new ConnectionValidator();
+        var validator = new FConnectionValidator();
         var newCredentials = Creds
             .Select(x => new AuthenticationCredentialsProvider(x.KeyName, x.Value + "_incorrect"));
 
