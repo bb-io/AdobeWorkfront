@@ -30,4 +30,11 @@ public class ProjectActions(InvocationContext invocationContext) : Invocable(inv
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(apiRequest);
         return response.Data;
     }
+    
+    [Action("Delete project", Description = "Delete a specific project by its ID")]
+    public async Task DeleteProject([ActionParameter] ProjectRequest projectRequest)
+    {
+        var apiRequest = new RestRequest($"/attask/api/v19.0/project/{projectRequest.ProjectId}", Method.Delete);
+        await Client.ExecuteWithErrorHandling(apiRequest);
+    }
 }
