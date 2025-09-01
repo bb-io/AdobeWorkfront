@@ -1,4 +1,5 @@
-﻿using Apps.AdobeWorkfront.Models.Entities;
+﻿using Apps.AdobeWorkfront.Constants;
+using Apps.AdobeWorkfront.Models.Entities;
 using Blackbird.Applications.Sdk.Common;
 
 namespace Apps.AdobeWorkfront.Models.Requests;
@@ -43,17 +44,15 @@ public class SearchProjectsRequest
 
         void AddRangeFilter(string field, DateTimeOffset? from, DateTimeOffset? to)
         {
-            const string fmt = "yyyy-MM-ddTHH:mm:ss.fffK";
-
             if (from is { } f)
             {
-                result.Add(new QueryParameter(field, f.ToString(fmt)));
+                result.Add(new QueryParameter(field, f.ToString(DateTimeFormats.Fmt)));
                 result.Add(new QueryParameter($"{field}_Mod", "gte"));
             }
 
             if (to is { } t)
             {
-                result.Add(new QueryParameter(field, t.ToString(fmt)));
+                result.Add(new QueryParameter(field, t.ToString(DateTimeFormats.Fmt)));
                 result.Add(new QueryParameter($"{field}_Mod", "lte"));
             }
         }

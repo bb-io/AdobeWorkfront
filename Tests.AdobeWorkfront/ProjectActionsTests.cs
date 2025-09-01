@@ -44,7 +44,7 @@ public class ProjectActionsTests : TestBase
     public async Task GetProject_WithValidId_ShouldReturnProject()
     {
         var projectActions = new ProjectActions(InvocationContext);
-        var validProjectId = "68b16191000205545ecdee7125a2900c"; 
+        var validProjectId = "68b54c4e01933961ed7e22eaca8a7b40"; 
 
         var result = await projectActions.GetProject(new() { ProjectId = validProjectId });
 
@@ -69,5 +69,26 @@ public class ProjectActionsTests : TestBase
         Assert.AreEqual(exception.Message.Contains("not found", StringComparison.OrdinalIgnoreCase), true);
         
         Console.WriteLine($"Caught expected exception: {exception.Message}");
+    }
+    
+    [TestMethod]
+    public async Task CreateProject_WithValidData_ShouldCreateProject()
+    {
+        var projectActions = new ProjectActions(InvocationContext);
+        var newProjectName = $"Test Project {Guid.NewGuid()}";
+
+        var result = await projectActions.CreateProject(new()
+        {
+            Name = newProjectName,
+            PlannedStartDate = DateTimeOffset.UtcNow.DateTime,
+            PlannedCompletionDate = DateTimeOffset.UtcNow.AddDays(30).DateTime,
+            Priority = 1,
+            Status = "New"
+        });
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(newProjectName, result.Name);
+
+        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
