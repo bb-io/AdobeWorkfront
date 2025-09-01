@@ -81,7 +81,6 @@ public class ProjectActionsTests : TestBase
         {
             Name = newProjectName,
             PlannedStartDate = DateTimeOffset.UtcNow.DateTime,
-            PlannedCompletionDate = DateTimeOffset.UtcNow.AddDays(30).DateTime,
             Priority = 1,
             Status = "New"
         });
@@ -90,5 +89,35 @@ public class ProjectActionsTests : TestBase
         Assert.AreEqual(newProjectName, result.Name);
 
         Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    
+    [TestMethod]
+    public async Task UpdateProject_WithValidData_ShouldUpdateProject()
+    {
+        var projectActions = new ProjectActions(InvocationContext);
+        var existingProjectId = "68b54ce70192648c87059e415737c6cf";
+        var updatedProjectName = $"Updated Project {Guid.NewGuid()}";
+
+        var result = await projectActions.UpdateProject(new()
+        {
+            ProjectId = existingProjectId,
+            Name = updatedProjectName,
+            PlannedStartDate = DateTimeOffset.UtcNow.AddDays(15).DateTime,
+            Priority = 2
+        });
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(updatedProjectName, result.Name);
+
+        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    
+    [TestMethod]
+    public async Task DeleteProject_WithValidId_ShouldDeleteProject()
+    {
+        var projectActions = new ProjectActions(InvocationContext);
+        var projectIdToDelete = "68b54faa01941eb54b5a7ab188282918";
+
+        await projectActions.DeleteProject(new() { ProjectId = projectIdToDelete });
     }
 }

@@ -4,10 +4,10 @@ using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.AdobeWorkfront.Models.Requests;
 
-public class CreateProjectRequest
+public class UpdateProjectRequest : ProjectRequest
 {
     [Display("Project name")]
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
 
     [Display("Object code")]
     public string? ObjCode { get; set; }

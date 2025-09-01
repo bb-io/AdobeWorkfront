@@ -1,6 +1,8 @@
 ﻿using Apps.AdobeWorkfront.Constants;
+using Apps.AdobeWorkfront.Handlers.Static;
 using Apps.AdobeWorkfront.Models.Entities;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.AdobeWorkfront.Models.Requests;
 
@@ -9,7 +11,7 @@ public class SearchProjectsRequest
     [Display("Project name")]
     public string? Name { get; set; }
     
-    [Display("Project status")]
+    [Display("Project status"), StaticDataSource(typeof(ProjectStatusDataHandler))]
     public string? Status { get; set; }
 
     [Display("Planned completion date from")]

@@ -6,7 +6,6 @@ using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace Apps.AdobeWorkfront.Actions;
@@ -50,12 +49,6 @@ public class ProjectActions(InvocationContext invocationContext) : Invocable(inv
                 createRequest.PlannedStartDate.Value.ToString(DateTimeFormats.Fmt));
         }
         
-        if(createRequest.PlannedCompletionDate.HasValue)
-        {
-            apiRequest.AddQueryParameter("plannedCompletionDate",
-                createRequest.PlannedCompletionDate.Value.ToString(DateTimeFormats.Fmt));
-        }
-        
         if(createRequest.Priority.HasValue)
         {
             apiRequest.AddQueryParameter("priority", createRequest.Priority.Value.ToString());
@@ -66,10 +59,34 @@ public class ProjectActions(InvocationContext invocationContext) : Invocable(inv
             apiRequest.AddQueryParameter("status", createRequest.Status);
         }
         
-        if(createRequest.ProjectedCompletionDate.HasValue)
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(apiRequest);
+        return response.Data;
+    }
+    
+    [Action("Update project", Description = "Update an existing project with new details")]
+    public async Task<ProjectResponse> UpdateProject([ActionParameter] UpdateProjectRequest updateRequest)
+    {
+        var apiRequest = new RestRequest($"/attask/api/v19.0/project", Method.Put)
+            .AddQueryParameter("id", updateRequest.ProjectId);
+        
+        var properties = updateRequest.GetType().GetProperties()
+            .Where(p => p.Name != nameof(UpdateProjectRequest.ProjectId))
+            .ToDictionary(p => p.Name, p => p.GetValue(updateRequest)?.ToString());
+        
+        foreach (var (key, value) in properties)
         {
-            apiRequest.AddQueryParameter("projectedCompletionDate",
-                createRequest.ProjectedCompletionDate.Value.ToString(DateTimeFormats.Fmt));
+            if (value != null)
+            {
+                if (key.EndsWith("Date") && DateTime.TryParse(value, out var dateValue))
+                {
+                    apiRequest.AddQueryParameter(char.ToLowerInvariant(key[0]) + key[1..],
+                        dateValue.ToString(DateTimeFormats.Fmt));
+                }
+                else
+                {
+                    apiRequest.AddQueryParameter(char.ToLowerInvariant(key[0]) + key[1..], value);
+                }
+            }
         }
         
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(apiRequest);
