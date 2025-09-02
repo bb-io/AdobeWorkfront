@@ -6,13 +6,16 @@ using Blackbird.Applications.Sdk.Common.Dictionaries;
 
 namespace Apps.AdobeWorkfront.Models.Requests;
 
-public class SearchProjectsRequest
+public class SearchTasksRequest
 {
-    [Display("Project name")]
+    [Display("Task name")]
     public string? Name { get; set; }
     
-    [Display("Project status"), StaticDataSource(typeof(ProjectStatusDataHandler))]
+    [Display("Task status"), StaticDataSource(typeof(TaskStatusDataHandler))]
     public string? Status { get; set; }
+    
+    [Display("Progress status"), StaticDataSource(typeof(ProgressStatusDataHandler))]
+    public string? ProgressStatus { get; set; }
 
     [Display("Planned completion date from")]
     public DateTime? PlannedCompletionDateFrom { get; set; }
@@ -61,6 +64,7 @@ public class SearchProjectsRequest
 
         AddIf("name", Name);
         AddIf("status", Status);
+        AddIf("progressStatus", ProgressStatus);
 
         AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo);
         AddRangeFilter("plannedCompletionDate", PlannedCompletionDateFrom, PlannedCompletionDateTo);

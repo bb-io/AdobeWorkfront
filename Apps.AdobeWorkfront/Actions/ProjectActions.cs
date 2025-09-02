@@ -13,6 +13,8 @@ namespace Apps.AdobeWorkfront.Actions;
 [ActionList("Projects")]
 public class ProjectActions(InvocationContext invocationContext) : Invocable(invocationContext)
 {
+    private const string ProjectFields = "percentComplete,plannedCompletionDate,plannedStartDate,priority,projectedCompletionDate,status,tasks,tasks:assignedToID,tasks:assignmentsListString,tasks:status";
+    
     [Action("Search projects", Description = "Retrieve a list of projects based on search criteria")]
     public async Task<SearchProjectsResponse> SearchProjects([ActionParameter] SearchProjectsRequest request)
     {
@@ -20,15 +22,19 @@ public class ProjectActions(InvocationContext invocationContext) : Invocable(inv
         var parameters = request.GetFilterQueryParameters();
         apiRequest.ApplyToRequest(parameters);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<ProjectResponse>>>(apiRequest);
+        apiRequest.AddQueryParameter("fields", ProjectFields);
+        
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<ProjectWithTasksResponse>>>(apiRequest);
         return new(response.Data);
     }
     
     [Action("Get project", Description = "Retrieve details of a specific project by its ID")]
-    public async Task<ProjectResponse> GetProject([ActionParameter] ProjectRequest projectRequest)
+    public async Task<ProjectWithTasksResponse> GetProject([ActionParameter] ProjectRequest projectRequest)
     {
-        var apiRequest = new RestRequest($"/attask/api/v19.0/project/{projectRequest.ProjectId}");
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(apiRequest);
+        var apiRequest = new RestRequest($"/attask/api/v19.0/project/{projectRequest.ProjectId}")
+            .AddQueryParameter("fields", ProjectFields);
+
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ProjectWithTasksResponse>>(apiRequest);
         return response.Data;
     }
     
