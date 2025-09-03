@@ -57,25 +57,65 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
             await AssignUsersToTask(response.Data.TaskId, createRequest.AssigneeIds);
         }
         
+        return await GetTask(new() { TaskId = response.Data.TaskId });
+    }
+    
+    [Action("Delete task", Description = "Delete a task by its ID")]
+    public async Task DeleteTask([ActionParameter] TaskRequest taskRequest)
+    {
+        var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}", Method.Delete);
+        await Client.ExecuteWithErrorHandling(apiRequest);
+    }
+    
+    [Action("Update task", Description = "Update an existing task with new details")]
+    public async Task<TaskResponse> UpdateTask([ActionParameter] UpdateTaskRequest updateRequest)
+    {
+        var apiRequest = new RestRequest("/attask/api/v19.0/task", Method.Put)
+            .AddQueryParameter("id", updateRequest.TaskId);
+        
+        if (!string.IsNullOrEmpty(updateRequest.Name))
+        {
+            apiRequest.AddQueryParameter("name", updateRequest.Name);
+        }
+        
+        if (!string.IsNullOrEmpty(updateRequest.Status))
+        {
+            apiRequest.AddQueryParameter("status", updateRequest.Status);
+        }
+        
+        if (updateRequest.Priority.HasValue)
+        {
+            apiRequest.AddQueryParameter("priority", updateRequest.Priority.Value);
+        }
+        
+        apiRequest.AddQueryParameter("fields", TaskFields);
+        
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
+        
+        if (updateRequest.AssigneeIds != null)
+        {
+            await AssignUsersToTask(response.Data.TaskId, updateRequest.AssigneeIds);
+        }
+        
         return response.Data;
     }
     
     private async Task AssignUsersToTask(string taskId, IEnumerable<string> userIds)
     {
-        foreach (var userId in userIds)
+        try
         {
-            try
-            {
-                var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskId}/assign", Method.Put)
-                    .AddQueryParameter("objID", userId)
-                    .AddQueryParameter("objCode", "USER");
+            var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskId}/assignMultiple", Method.Put)
+                .AddJsonBody(new
+                {
+                    userIDs = userIds,
+                    roleIDs = Array.Empty<string>()
+                });
 
-                await Client.ExecuteWithErrorHandling(apiRequest);
-            }
-            catch (Exception e)
-            {
-                throw new PluginApplicationException($"Could not assign user {userId} to task {taskId}: {e.Message}");
-            }
+            await Client.ExecuteWithErrorHandling(apiRequest);
+        }
+        catch (Exception e)
+        {
+            throw new PluginApplicationException($"Could not assign users to task {taskId}: {e.Message}");
         }
     }
 }

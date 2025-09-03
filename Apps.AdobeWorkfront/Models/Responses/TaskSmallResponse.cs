@@ -20,6 +20,6 @@ public class TaskSmallResponse
     [Display("Assigned to ID"), JsonProperty("assignedToID")]
     public string? AssignedToId { get; set; }
     
-    [Display("Assigned to name"), JsonProperty("assignmentsListString")]
-    public string? AssignedToName { get; set; }
+    [Display("Assigned to names"), JsonProperty("assignmentsListString")]
+    public string? AssignedToNames { get; set; }
 }
