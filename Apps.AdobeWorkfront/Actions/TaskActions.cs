@@ -60,13 +60,6 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
         return await GetTask(new() { TaskId = response.Data.TaskId });
     }
     
-    [Action("Delete task", Description = "Delete a task by its ID")]
-    public async Task DeleteTask([ActionParameter] TaskRequest taskRequest)
-    {
-        var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}", Method.Delete);
-        await Client.ExecuteWithErrorHandling(apiRequest);
-    }
-    
     [Action("Update task", Description = "Update an existing task with new details")]
     public async Task<TaskResponse> UpdateTask([ActionParameter] UpdateTaskRequest updateRequest)
     {
@@ -98,6 +91,13 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
         }
         
         return response.Data;
+    }
+    
+    [Action("Delete task", Description = "Delete a task by its ID")]
+    public async Task DeleteTask([ActionParameter] TaskRequest taskRequest)
+    {
+        var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}", Method.Delete);
+        await Client.ExecuteWithErrorHandling(apiRequest);
     }
     
     private async Task AssignUsersToTask(string taskId, IEnumerable<string> userIds)
