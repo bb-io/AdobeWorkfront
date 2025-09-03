@@ -100,6 +100,12 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
         await Client.ExecuteWithErrorHandling(apiRequest);
     }
     
+    [Action("Assign users to task", Description = "Assign multiple users to a specific task")]
+    public async Task AssignUsersToTask([ActionParameter] AssignUsersRequest assignRequest)
+    {
+        await AssignUsersToTask(assignRequest.TaskId, assignRequest.UserIds);
+    }
+    
     private async Task AssignUsersToTask(string taskId, IEnumerable<string> userIds)
     {
         try
