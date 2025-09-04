@@ -5,7 +5,7 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.AdobeWorkfront.Handlers;
 
-public class ParentDataHandler(InvocationContext invocationContext, [ActionParameter] UploadFileRequest uploadFileRequest) 
+public class ParentDataHandler(InvocationContext invocationContext, [ActionParameter] ParentRequest uploadFileRequest) 
     : Invocable(invocationContext), IAsyncDataSourceItemHandler
 {
     public Task<IEnumerable<DataSourceItem>> GetDataAsync(DataSourceContext context, CancellationToken cancellationToken)

@@ -1,3 +1,4 @@
+using System.Net;
 using Apps.AdobeWorkfront.Models.Dtos;
 using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
@@ -12,7 +13,7 @@ public class Client : BlackBirdRestClient
 {
     public Client(List<AuthenticationCredentialsProvider> credentialsProviders) : base(new()
     {
-        BaseUrl = new Uri(credentialsProviders.GetBaseUrl()),
+        BaseUrl = new Uri(credentialsProviders.GetBaseUrl())
     })
     {
         this.AddDefaultHeader(credentialsProviders.GetTokenType(), credentialsProviders.GetAccessToken());

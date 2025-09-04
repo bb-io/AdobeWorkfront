@@ -19,6 +19,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)
     {
+        
         var apiRequest = new RestRequest("/attask/api/v19.0/task/search");
         var parameters = request.GetFilterQueryParameters();
         apiRequest.ApplyToRequest(parameters);
@@ -82,9 +83,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
         }
         
         apiRequest.AddQueryParameter("fields", TaskFields);
-        
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
-        
         if (updateRequest.AssigneeIds != null)
         {
             await AssignUsersToTask(response.Data.TaskId, updateRequest.AssigneeIds);
@@ -98,12 +97,6 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     {
         var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}", Method.Delete);
         await Client.ExecuteWithErrorHandling(apiRequest);
-    }
-    
-    [Action("Assign users to task", Description = "Assign multiple users to a specific task")]
-    public async Task AssignUsersToTask([ActionParameter] AssignUsersRequest assignRequest)
-    {
-        await AssignUsersToTask(assignRequest.TaskId, assignRequest.UserIds);
     }
     
     private async Task AssignUsersToTask(string taskId, IEnumerable<string> userIds)
