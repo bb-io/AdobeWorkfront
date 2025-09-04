@@ -28,15 +28,10 @@ public class CustomFieldDataHandler(InvocationContext invocationContext, [Action
             .AddQueryParameter("fields", "parameterValues:*");
 
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<ObjectWithCustomFieldsDto>>(apiRequest);
-        var list = response.Data.CustomFields
+        return response.Data.CustomFields
             .Where(x => x.Value is string) 
             .Where(x => context.SearchString == null || x.Key.Contains(context.SearchString, StringComparison.OrdinalIgnoreCase))
             .Select(cf => new DataSourceItem(cf.Key, cf.Key))
             .ToList();
-
-        var customFieldKeys = string.Join(",", response.Data.CustomFields.Keys.ToList());
-        list.Insert(0, new DataSourceItem("First", $"{response.Data.Id}: {customFieldKeys}"));
-        
-        return list;
     }
 }
