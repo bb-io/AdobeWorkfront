@@ -14,7 +14,7 @@ namespace Apps.AdobeWorkfront.Actions;
 public class TaskActions(InvocationContext invocationContext) : Invocable(invocationContext)
 {
     private const string TaskFields =
-        "percentComplete,plannedCompletionDate,plannedStartDate,priority,progressStatus,projectedCompletionDate,projectedStartDate,status,taskNumber,wbs,assignmentsListString,assignedToID,parentID";
+        "percentComplete,plannedCompletionDate,plannedStartDate,priority,progressStatus,projectedCompletionDate,projectedStartDate,status,taskNumber,wbs,assignmentsListString,assignedToID,parentID,description";
     
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)

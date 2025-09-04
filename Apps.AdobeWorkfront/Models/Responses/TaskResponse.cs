@@ -14,6 +14,9 @@ public class TaskResponse : TaskSmallResponse
     
     [JsonProperty("parentID"), Display("Parent ID")]
     public string ParentId { get; set; } = string.Empty;
+
+    [JsonProperty("description"), Display("Description")]
+    public string Description { get; set; } = string.Empty;
     
     [JsonProperty("plannedCompletionDate"), Display("Planned completion date"), JsonConverter(typeof(WorkfrontDateTimeConverter))]
     public DateTime PlannedCompletionDate { get; set; }
