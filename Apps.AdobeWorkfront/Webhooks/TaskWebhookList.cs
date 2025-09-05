@@ -19,7 +19,7 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
         [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase));
 
-    private async Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : BaseResponse
+    private async Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : class
     {
         var body = webhookRequest.Body.ToString();
         if (string.IsNullOrEmpty(body))
@@ -41,27 +41,11 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
                 Result = payload.NewState
             };
         }
-        
-        var task = await GetTask<T>(payload.NewState.GetId());
+
         return new WebhookResponse<T>
         {
             ReceivedWebhookRequestType = WebhookRequestType.Preflight,
-            Result = task
+            Result = payload.NewState
         };
-    }
-
-    private async Task<T> GetTask<T>(string taskId)
-    {
-        try
-        {
-            var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskId}");
-            apiRequest.AddQueryParameter("fields", Fields.TaskFields);
-            var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<T>>(apiRequest);
-            return response.Data;
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"[Workfront] Unable to retrieve task with ID {taskId}.", e);
-        }
     }
 }
