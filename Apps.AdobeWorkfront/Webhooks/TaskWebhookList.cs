@@ -19,7 +19,7 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
         [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase));
 
-    private async Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : class
+    private Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : class
     {
         var body = webhookRequest.Body.ToString();
         if (string.IsNullOrEmpty(body))
@@ -35,17 +35,17 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
 
         if (triggerFlight.Invoke(payload) == false)
         {
-            return new WebhookResponse<T>
+            return Task.FromResult(new WebhookResponse<T>
             {
                 ReceivedWebhookRequestType = WebhookRequestType.Preflight,
                 Result = payload.NewState
-            };
+            });
         }
 
-        return new WebhookResponse<T>
+        return Task.FromResult(new WebhookResponse<T>
         {
             ReceivedWebhookRequestType = WebhookRequestType.Preflight,
             Result = payload.NewState
-        };
+        });
     }
 }
