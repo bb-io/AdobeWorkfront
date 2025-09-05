@@ -1,4 +1,5 @@
-﻿using Apps.AdobeWorkfront.Models.Dtos;
+﻿using Apps.AdobeWorkfront.Constants;
+using Apps.AdobeWorkfront.Models.Dtos;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Utils;
@@ -13,8 +14,7 @@ namespace Apps.AdobeWorkfront.Actions;
 [ActionList("Tasks")]
 public class TaskActions(InvocationContext invocationContext) : Invocable(invocationContext)
 {
-    private const string TaskFields =
-        "percentComplete,plannedCompletionDate,plannedStartDate,priority,progressStatus,projectedCompletionDate,projectedStartDate,status,taskNumber,wbs,assignmentsListString,assignedToID,parentID,description";
+    private const string TaskFields = Fields.TaskFields;
     
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)

@@ -1,10 +1,13 @@
-﻿using Apps.AdobeWorkfront.Models.Requests;
+﻿using Apps.AdobeWorkfront.Constants;
+using Apps.AdobeWorkfront.Models.Dtos;
+using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Webhooks.Handlers.TaskHandlers;
 using Apps.AdobeWorkfront.Webhooks.Payload;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
+using RestSharp;
 
 namespace Apps.AdobeWorkfront.Webhooks;
 
@@ -16,7 +19,7 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
         [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase));
 
-    private Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : class
+    private async Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : BaseResponse
     {
         var body = webhookRequest.Body.ToString();
         if (string.IsNullOrEmpty(body))
@@ -32,17 +35,33 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
 
         if (triggerFlight.Invoke(payload) == false)
         {
-            return Task.FromResult(new WebhookResponse<T>
+            return new WebhookResponse<T>
             {
                 ReceivedWebhookRequestType = WebhookRequestType.Preflight,
                 Result = payload.NewState
-            });
+            };
         }
         
-        return Task.FromResult(new WebhookResponse<T>
+        var task = await GetTask<T>(payload.NewState.GetId());
+        return new WebhookResponse<T>
         {
-            ReceivedWebhookRequestType = WebhookRequestType.Default,
-            Result = payload.NewState
-        });
+            ReceivedWebhookRequestType = WebhookRequestType.Preflight,
+            Result = task
+        };
+    }
+
+    private async Task<T> GetTask<T>(string taskId)
+    {
+        try
+        {
+            var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskId}");
+            apiRequest.AddQueryParameter("fields", Fields.TaskFields);
+            var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<T>>(apiRequest);
+            return response.Data;
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"[Workfront] Unable to retrieve task with ID {taskId}.", e);
+        }
     }
 }
