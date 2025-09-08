@@ -23,11 +23,13 @@ public abstract class BaseWebhookList(InvocationContext invocationContext) : Inv
         }
 
         var authHeader = webhookRequest.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
-        var responseMessage = new HttpResponseMessage(HttpStatusCode.Accepted);
+        var responseMessage = new HttpResponseMessage(HttpStatusCode.OK);
         if (!string.IsNullOrEmpty(authHeader.Value))
         {
             responseMessage.Headers.Add("Authorization", authHeader.Value);
         }
+        
+        responseMessage.Content = new StringContent("{\"received\": true}", System.Text.Encoding.UTF8, "application/json");
         
         if (triggerFlight.Invoke(payload) == false)
         {
