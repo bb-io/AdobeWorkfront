@@ -1,48 +1,28 @@
 ﻿using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Webhooks.Handlers.TaskHandlers;
-using Apps.AdobeWorkfront.Webhooks.Payload;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
-using Newtonsoft.Json;
 
 namespace Apps.AdobeWorkfront.Webhooks;
 
 [WebhookList("Tasks")]
-public class TaskWebhookList(InvocationContext invocationContext) : Invocable(invocationContext)
+public class TaskWebhookList(InvocationContext invocationContext) : BaseWebhookList(invocationContext)
 {
     [Webhook("On task status changed", typeof(TaskStatusChangedHandler), Description = "Triggers when a task's status changes")]
     public Task<WebhookResponse<TaskResponse>> OnTaskStatusChanged(WebhookRequest webhookRequest,
         [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase));
 
-    private Task<WebhookResponse<T>> HandleWebhook<T>(WebhookRequest webhookRequest, Func<WebhookPayload<T>, bool> triggerFlight) where T : class
-    {
-        var body = webhookRequest.Body.ToString();
-        if (string.IsNullOrEmpty(body))
-        {
-            throw new ArgumentException("[Workfront] Incoming webhook body is null or empty.");
-        }
+    [Webhook("On task changed", typeof(TaskChangedHandler), Description = "Triggers when any property of a task changes")]
+    public Task<WebhookResponse<TaskResponse>> OnTaskChanged(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
+        payload => true);
 
-        var payload = JsonConvert.DeserializeObject<WebhookPayload<T>>(body);
-        if (payload == null)
-        {
-            throw new ArgumentException("[Workfront] Unable to deserialize incoming webhook body.");
-        }
+    [Webhook("On task created", typeof(TaskCreatedHandler), Description = "Triggers when a new task is created")]
+    public Task<WebhookResponse<TaskResponse>> OnTaskCreated(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
+        payload => true);
 
-        if (triggerFlight.Invoke(payload) == false)
-        {
-            return Task.FromResult(new WebhookResponse<T>
-            {
-                ReceivedWebhookRequestType = WebhookRequestType.Preflight,
-                Result = payload.NewState
-            });
-        }
-
-        return Task.FromResult(new WebhookResponse<T>
-        {
-            ReceivedWebhookRequestType = WebhookRequestType.Default,
-            Result = payload.NewState
-        });
-    }
+    [Webhook("On task deleted", typeof(TaskDeletedHandler), Description = "Triggers when a task is deleted")]
+    public Task<WebhookResponse<TaskResponse>> OnTaskDeleted(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
+        payload => true);
 }
