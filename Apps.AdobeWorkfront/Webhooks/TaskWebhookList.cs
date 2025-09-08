@@ -1,13 +1,10 @@
-﻿using Apps.AdobeWorkfront.Constants;
-using Apps.AdobeWorkfront.Models.Dtos;
-using Apps.AdobeWorkfront.Models.Requests;
+﻿using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Webhooks.Handlers.TaskHandlers;
 using Apps.AdobeWorkfront.Webhooks.Payload;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
 using Newtonsoft.Json;
-using RestSharp;
 
 namespace Apps.AdobeWorkfront.Webhooks;
 
@@ -44,7 +41,7 @@ public class TaskWebhookList(InvocationContext invocationContext) : Invocable(in
 
         return Task.FromResult(new WebhookResponse<T>
         {
-            ReceivedWebhookRequestType = WebhookRequestType.Preflight,
+            ReceivedWebhookRequestType = WebhookRequestType.Default,
             Result = payload.NewState
         });
     }
