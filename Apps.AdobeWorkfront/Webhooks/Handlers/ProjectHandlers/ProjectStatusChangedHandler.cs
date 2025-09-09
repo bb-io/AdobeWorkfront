@@ -9,13 +9,13 @@ public class ProjectStatusChangedHandler(InvocationContext invocationContext) : 
     
     protected override string EventType => "UPDATE";
 
-    protected override List<FilterDto> Filters => new()
-    {
+    protected override List<FilterDto> Filters =>
+    [
         new FilterDto
         {
             FieldName = "status",
             FieldValue = "",
             Comparison = "changed"
         }
-    };
+    ];
 }
