@@ -32,7 +32,7 @@ public abstract class BaseWebhookHandler(InvocationContext invocationContext)
             {
                 ObjCode = ObjectCode,
                 EventType = EventType,
-                Url = values["payloadUrl"],
+                Url = _bridgeService.BridgeServiceUrl,
                 AuthToken = BuildAuthToken(),
                 Filters = Filters
             };

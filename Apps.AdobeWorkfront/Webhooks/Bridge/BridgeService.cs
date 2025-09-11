@@ -7,6 +7,8 @@ public class BridgeService(string bridgeServiceUrl)
 {
     private readonly RestClient _client = new(bridgeServiceUrl);
 
+    public string BridgeServiceUrl { get; } = bridgeServiceUrl;
+
     public async Task Subscribe(string @event, string subscriptionId, string url)
     {
         var request = new RestRequest($"/{subscriptionId}/{@event}", Method.Post)

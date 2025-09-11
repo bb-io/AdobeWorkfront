@@ -18,7 +18,7 @@ public class FConnectionValidator: IConnectionValidator
         
         try
         {
-            //await client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(request);
+            await client.ExecuteWithErrorHandling<DataWrapperDto<ProjectResponse>>(request);
             return new()
             {
                 IsValid = true
