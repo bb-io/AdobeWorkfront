@@ -21,8 +21,4 @@ public class TaskWebhookList(InvocationContext invocationContext) : BaseWebhookL
     [Webhook("On task created", typeof(TaskCreatedHandler), Description = "Triggers when a new task is created")]
     public Task<WebhookResponse<TaskResponse>> OnTaskCreated(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => true);
-
-    [Webhook("On task deleted", typeof(TaskDeletedHandler), Description = "Triggers when a task is deleted")]
-    public Task<WebhookResponse<TaskResponse>> OnTaskDeleted(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
-        payload => true);
 }

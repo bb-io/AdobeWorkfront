@@ -21,8 +21,4 @@ public class ProjectWebhookList(InvocationContext invocationContext) : BaseWebho
     [Webhook("On project created", typeof(ProjectCreatedHandler), Description = "Triggers when a new project is created")]
     public Task<WebhookResponse<ProjectResponse>> OnProjectCreated(WebhookRequest webhookRequest) => HandleWebhook<ProjectResponse>(webhookRequest, 
         payload => true);
-
-    [Webhook("On project deleted", typeof(ProjectDeletedHandler), Description = "Triggers when a project is deleted")]
-    public Task<WebhookResponse<ProjectResponse>> OnProjectDeleted(WebhookRequest webhookRequest) => HandleWebhook<ProjectResponse>(webhookRequest, 
-        payload => true);
 }
