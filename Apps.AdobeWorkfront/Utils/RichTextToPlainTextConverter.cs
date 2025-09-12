@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text;
 
 namespace Apps.AdobeWorkfront.Utils;
@@ -97,32 +98,58 @@ public class RichTextToPlainTextConverter
 
     private class RichTextDocument
     {
+        [JsonPropertyName("blocks")]
         public RichTextBlock[] Blocks { get; set; } = Array.Empty<RichTextBlock>();
+        
+        [JsonPropertyName("entityMap")]
         public object EntityMap { get; set; } = new object();
     }
 
     private class RichTextBlock
     {
+        [JsonPropertyName("key")]
         public string Key { get; set; } = string.Empty;
+        
+        [JsonPropertyName("text")]
         public string Text { get; set; } = string.Empty;
+        
+        [JsonPropertyName("type")]
         public string Type { get; set; } = string.Empty;
+        
+        [JsonPropertyName("depth")]
         public int Depth { get; set; }
+        
+        [JsonPropertyName("inlineStyleRanges")]
         public InlineStyleRange[] InlineStyleRanges { get; set; } = Array.Empty<InlineStyleRange>();
+        
+        [JsonPropertyName("entityRanges")]
         public EntityRange[] EntityRanges { get; set; } = Array.Empty<EntityRange>();
+        
+        [JsonPropertyName("data")]
         public object Data { get; set; } = new object();
     }
 
     private class InlineStyleRange
     {
+        [JsonPropertyName("offset")]
         public int Offset { get; set; }
+        
+        [JsonPropertyName("length")]
         public int Length { get; set; }
+        
+        [JsonPropertyName("style")]
         public string Style { get; set; } = string.Empty;
     }
 
     private class EntityRange
     {
+        [JsonPropertyName("offset")]
         public int Offset { get; set; }
+        
+        [JsonPropertyName("length")]
         public int Length { get; set; }
+        
+        [JsonPropertyName("key")]
         public int Key { get; set; }
     }
 }
