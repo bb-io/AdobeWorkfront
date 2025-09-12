@@ -106,6 +106,21 @@ Once you have your **Base URL**, **Client ID**, and **Client Secret**, you are r
 
 - **On document uploaded**: Triggered when a new document is uploaded.
 
+## Example
+
+Here’s an example of how to set up a support workflow with `Slack` and `Adobe Workfront` that will automatically create a Workfront task from a client request in Slack and then return the response back to the client in Slack once the task is completed.
+
+![Slack-Workfront example](docs/assets/example.png)
+
+* The workflow starts with the `On app mentioned` event in Slack. When a client mentions the app in Slack with a request, the event is triggered.
+* The `Chat` action with OpenAI is used to process the client’s message and generate a suitable task title.
+* The `Create task` action in Adobe Workfront creates a new task using the generated title.
+* The `On task status changed` event in Adobe Workfront monitors the status of the created task. When the task is marked as completed, the flow continues.
+* The `Get string custom field value` action retrieves the content of a custom field called **Answer to client** from the completed task.
+* Finally, the `Send message` action in Slack sends the value of **Answer to client** back to the original Slack thread, providing the client with the requested response.
+
+
+
 ## Feedback
 
 Do you want to use this app or do you have feedback on our implementation? Reach out to us using the [established channels](https://www.blackbird.io/) or create an issue.
