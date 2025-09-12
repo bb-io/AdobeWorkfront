@@ -11,12 +11,15 @@ public class TaskWebhookList(InvocationContext invocationContext) : BaseWebhookL
 {
     [Webhook("On task status changed", typeof(TaskStatusChangedHandler), Description = "Triggers when a task's status changes")]
     public Task<WebhookResponse<TaskResponse>> OnTaskStatusChanged(WebhookRequest webhookRequest,
-        [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
-        payload => taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase));
+        [WebhookParameter] TaskStatusOptionalRequest taskStatusOptionalRequest,
+        [WebhookParameter] TaskOptionalRequest taskOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
+        payload => (taskStatusOptionalRequest.TaskStatus == null || payload.NewState.Status.Equals(taskStatusOptionalRequest.TaskStatus, StringComparison.OrdinalIgnoreCase)) &&
+                   (taskOptionalRequest.TaskId == null || payload.NewState.TaskId.Equals(taskOptionalRequest.TaskId, StringComparison.OrdinalIgnoreCase)));
 
     [Webhook("On task changed", typeof(TaskChangedHandler), Description = "Triggers when any property of a task changes")]
-    public Task<WebhookResponse<TaskResponse>> OnTaskChanged(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
-        payload => true);
+    public Task<WebhookResponse<TaskResponse>> OnTaskChanged(WebhookRequest webhookRequest,
+        [WebhookParameter] TaskOptionalRequest taskOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
+        payload => taskOptionalRequest.TaskId == null || payload.NewState.TaskId.Equals(taskOptionalRequest.TaskId, StringComparison.OrdinalIgnoreCase));
 
     [Webhook("On task created", typeof(TaskCreatedHandler), Description = "Triggers when a new task is created")]
     public Task<WebhookResponse<TaskResponse>> OnTaskCreated(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 

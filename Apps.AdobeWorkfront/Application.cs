@@ -12,7 +12,7 @@ public class Application : BaseInvocable, IApplication, ICategoryProvider
 
     public IEnumerable<ApplicationCategory> Categories
     {
-        get => [ApplicationCategory.Cms];
+        get => [ApplicationCategory.ProjectManagementAndProductivity, ApplicationCategory.TaskManagement];
         set { }
     }
 
