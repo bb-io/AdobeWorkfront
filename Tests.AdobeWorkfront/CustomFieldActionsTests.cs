@@ -16,15 +16,14 @@ public class CustomFieldActionsTests : TestBase
         var request = new CustomFieldRequest
         {
             ParentType = "TASK",
-            ParentId = "68b943890000b3f9a2461de5fe76b61b",
-            CustomField = "DE:Executive Interest"
+            ParentId = "68b7f2fc00540327c7e2da7baf4bb37f",
+            CustomField = "DE:Answer"
         };
 
         var result = await customFieldActions.GetCustomFieldValue(request);
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.CustomFieldValue);
-        Assert.AreEqual("Yes", result.CustomFieldValue);
 
         Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
     }

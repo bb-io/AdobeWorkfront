@@ -1,6 +1,7 @@
 ﻿using Apps.AdobeWorkfront.Models.Dtos;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
+using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -24,6 +25,12 @@ public class CustomFieldActions(InvocationContext invocationContext) : Invocable
         {
             if(customFieldValue is string strValue)
             {
+                if(RichTextToPlainTextConverter.IsRichText(strValue))
+                {
+                    var plainText = RichTextToPlainTextConverter.ConvertToPlainText(strValue);
+                    return new StringResponse(plainText);
+                }
+                
                 return new StringResponse(strValue);
             }
         }
