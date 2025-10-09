@@ -6,12 +6,12 @@
         <Nullable>enable</Nullable>
         <Product>Adobe Workfront [Beta]</Product>
         <Description>Adobe Workfront is a cloud-based work management solution designed to help teams and organizations efficiently plan, track, and manage their work.</Description>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <AssemblyName>Apps.AdobeWorkfront</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.0" />
+        <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.0-rc.10308" />
         <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.26" />
         <PackageReference Include="MimeTypes" Version="2.5.2">
           <PrivateAssets>all</PrivateAssets>
