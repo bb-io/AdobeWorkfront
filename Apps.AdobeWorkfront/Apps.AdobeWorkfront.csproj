@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>Adobe Workfront [Beta]</Product>
         <Description>Adobe Workfront is a cloud-based work management solution designed to help teams and organizations efficiently plan, track, and manage their work.</Description>
-        <Version>1.0.3</Version>
+        <Version>1.0.4</Version>
         <AssemblyName>Apps.AdobeWorkfront</AssemblyName>
     </PropertyGroup>
 

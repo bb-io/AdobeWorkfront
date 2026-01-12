@@ -10,24 +10,16 @@ public class ConnectionDefinition : IConnectionDefinition
     {
         new()
         {
-            Name = "Developer API key",
-            AuthenticationType = ConnectionAuthenticationType.Undefined,
+            Name = "OAuth2",
+            AuthenticationType = ConnectionAuthenticationType.OAuth2,
             ConnectionProperties = new List<ConnectionProperty>
-            {
+            {    
                 new(CredNames.BaseUrl)
                 {
                     DisplayName = "Base URL",
                     Sensitive = false,
                     Description = "Example: https://your-adobe-workfront-domain.com"
-                }
-            }
-        },
-        new()
-        {
-            Name = "OAuth2",
-            AuthenticationType = ConnectionAuthenticationType.OAuth2,
-            ConnectionProperties = new List<ConnectionProperty>
-            {
+                },
                 new(CredNames.ClientId)
                 {
                     DisplayName = "Client ID",
