@@ -2,6 +2,7 @@
 using Apps.AdobeWorkfront.Constants;
 using Apps.AdobeWorkfront.Models.Dtos;
 using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Authentication.OAuth2;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Newtonsoft.Json;
@@ -9,12 +10,25 @@ using Newtonsoft.Json;
 namespace Apps.AdobeWorkfront.Auth.OAuth2;
 
 public class OAuth2TokenService(InvocationContext invocationContext)
-    : BaseInvocable(invocationContext), IOAuth2TokenService
+    : BaseInvocable(invocationContext), IOAuth2TokenService, ITokenRefreshable
 {
-        public bool IsRefreshToken(Dictionary<string, string> values)
+    public bool IsRefreshToken(Dictionary<string, string> values)
     {
         var expiresAt = DateTime.Parse(values[CredNames.ExpiresAt]);
         return DateTime.UtcNow > expiresAt;
+    }
+
+    public int? GetRefreshTokenExprireInMinutes(Dictionary<string, string> values)
+    {
+        if (!values.TryGetValue(CredNames.ExpiresAt, out var expireValue))
+            return null;
+
+        if (!DateTime.TryParse(expireValue, out var expireDate))
+            return null;
+
+        var difference = expireDate - DateTime.UtcNow;
+
+        return (int)difference.TotalMinutes - 5;
     }
 
     public Task<Dictionary<string, string>> RefreshToken(Dictionary<string, string> values, CancellationToken cancellationToken)
