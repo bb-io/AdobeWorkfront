@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System.Globalization;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 
-namespace Apps.AdobeWorkfront.Utils;
+namespace Apps.AdobeWorkfront.Utils.Converters;
 
 public class WorkfrontDateTimeConverter : JsonConverter<DateTime?>
 {

@@ -81,6 +81,11 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
         {
             apiRequest.AddQueryParameter("priority", updateRequest.Priority.Value);
         }
+
+        if (updateRequest.PercentComplete.HasValue)
+        {
+            apiRequest.AddQueryParameter("percentComplete", updateRequest.PercentComplete.Value);
+        }
         
         apiRequest.AddQueryParameter("fields", TaskFields);
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
