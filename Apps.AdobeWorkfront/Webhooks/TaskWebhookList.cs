@@ -1,8 +1,12 @@
-﻿using Apps.AdobeWorkfront.Models.Requests;
+﻿using Apps.AdobeWorkfront.Constants;
+using Apps.AdobeWorkfront.Models.Dtos;
+using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Webhooks.Handlers.TaskHandlers;
+using Apps.AdobeWorkfront.Webhooks.Models;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Webhooks;
+using RestSharp;
 
 namespace Apps.AdobeWorkfront.Webhooks;
 
@@ -17,10 +21,37 @@ public class TaskWebhookList(InvocationContext invocationContext) : BaseWebhookL
                    (taskOptionalRequest.TaskId == null || payload.NewState.TaskId.Equals(taskOptionalRequest.TaskId, StringComparison.OrdinalIgnoreCase)));
 
     [Webhook("On task changed", typeof(TaskChangedHandler), Description = "Triggers when any property of a task changes")]
-    public Task<WebhookResponse<TaskResponse>> OnTaskChanged(WebhookRequest webhookRequest,
-        [WebhookParameter] TaskOptionalRequest taskOptionalRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
-        payload => taskOptionalRequest.TaskId == null || payload.NewState.TaskId.Equals(taskOptionalRequest.TaskId, StringComparison.OrdinalIgnoreCase));
+    public async Task<WebhookResponse<TaskResponse>> OnTaskChanged(WebhookRequest webhookRequest,
+        [WebhookParameter] TaskOptionalRequest taskOptionalRequest,
+        [WebhookParameter] OnTaskChangedRequest taskChangedRequest) 
+    {
+        var webhookResponse = await HandleWebhook<TaskResponse>(webhookRequest, payload => 
+        {
+            var task = payload.NewState;
 
+            if (!string.IsNullOrWhiteSpace(taskOptionalRequest.TaskId) && 
+                !task.TaskId.Equals(taskOptionalRequest.TaskId, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(taskChangedRequest.TaskNameContains) && 
+                !(task.Name?.Contains(taskChangedRequest.TaskNameContains, StringComparison.OrdinalIgnoreCase) ?? false))
+                return false;
+
+            return true;
+        });
+
+        if (webhookResponse.ReceivedWebhookRequestType != WebhookRequestType.Default || webhookResponse.Result == null)
+            return webhookResponse;
+        
+        var apiRequest = new RestRequest($"/attask/api/v19.0/task/{webhookResponse.Result.TaskId}")
+            .AddQueryParameter("fields", Fields.TaskFields);
+        
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
+        webhookResponse.Result.ProjectName = response.Data.ProjectName;
+
+        return webhookResponse;
+    }
+    
     [Webhook("On task created", typeof(TaskCreatedHandler), Description = "Triggers when a new task is created")]
     public Task<WebhookResponse<TaskResponse>> OnTaskCreated(WebhookRequest webhookRequest) => HandleWebhook<TaskResponse>(webhookRequest, 
         payload => true);

@@ -19,4 +19,7 @@ public class UpdateTaskRequest : TaskRequest
     
     [Display("Assignee IDs"), DataSource(typeof(UserDataHandler))]
     public IEnumerable<string>? AssigneeIds { get; set; }
+
+    [Display("Percent complete")]
+    public int? PercentComplete { get; set; }
 }

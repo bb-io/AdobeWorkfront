@@ -1,4 +1,4 @@
-﻿using Apps.AdobeWorkfront.Utils;
+﻿using Apps.AdobeWorkfront.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
 
@@ -6,6 +6,12 @@ namespace Apps.AdobeWorkfront.Models.Responses;
 
 public class TaskResponse : TaskSmallResponse
 {    
+    [JsonProperty("projectID"), Display("Project ID")]
+    public string ProjectId { get; set; } = string.Empty;
+    
+    [JsonProperty("project"), Display("Project name"), JsonConverter(typeof(WorkfrontProjectNameConverter))]
+    public string ProjectName { get; set; } = string.Empty;
+    
     [JsonProperty("progressStatus"), Display("Progress status")]
     public string ProgressStatus { get; set; } = string.Empty;
     
