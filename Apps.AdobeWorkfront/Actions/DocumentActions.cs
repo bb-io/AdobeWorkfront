@@ -1,6 +1,8 @@
 ﻿using Apps.AdobeWorkfront.Models.Dtos;
+using Apps.AdobeWorkfront.Models.Dtos.Document;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
+using Apps.AdobeWorkfront.Models.Responses.Document;
 using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -16,6 +18,7 @@ namespace Apps.AdobeWorkfront.Actions;
 public class DocumentActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : Invocable(invocationContext)
 {
     private const string DocumentFields = "downloadURL";
+    private const string SearchDocumentsFields = "ID,name,downloadURL,currentVersion:ext";
     
     [Action("Upload file", Description = "Upload a file and attach it to a task or project")]
     public async Task UploadFile([ActionParameter] UploadFileRequest request)
@@ -46,6 +49,33 @@ public class DocumentActions(InvocationContext invocationContext, IFileManagemen
         return new(fileReference);
     }
 
+    [Action("Search task documents", Description = "Search documents for a specific task")]
+    public async Task<SearchDocumentResponse> SearchTaskDocuments([ActionParameter] TaskRequest taskInput)
+    {
+        var apiRequest = new RestRequest("/attask/api/v19.0/docu/search")
+            .AddQueryParameter("objID", taskInput.TaskId)
+            .AddQueryParameter("docObjCode", "TASK")
+            .AddQueryParameter("fields", SearchDocumentsFields);
+    
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<DocumentResponse>>>(apiRequest);
+        
+        var dtos = response.Data.Select(x => new DocumentDto(x)).ToArray();
+        return new(dtos);
+    }
+    
+    [Action("Search project documents", Description = "Search documents for the entire specific project")]
+    public async Task<SearchDocumentResponse> SearchProjectDocuments([ActionParameter] ProjectRequest projectInput)
+    {
+        var apiRequest = new RestRequest("/attask/api/v19.0/docu/search")
+            .AddQueryParameter("projectID", projectInput.ProjectId)
+            .AddQueryParameter("fields", SearchDocumentsFields);
+
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<DocumentResponse>>>(apiRequest);
+
+        var dtos = response.Data.Select(x => new DocumentDto(x)).ToArray();
+        return new(dtos);
+    }
+    
     private async Task<string> UploadFile(FileReference file)
     {
         var fileStream = await fileManagementClient.DownloadAsync(file);

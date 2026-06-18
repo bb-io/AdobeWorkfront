@@ -13,4 +13,13 @@ public class DocumentResponse
     
     [Display("Download URL"), JsonProperty("downloadURL")]
     public string DownloadUrl { get; set; } = string.Empty;
+
+    [JsonProperty("currentVersion")] 
+    public DocumentVersionResponse CurrentVersion { get; set; } = null!;
+}
+
+public class DocumentVersionResponse
+{
+    [JsonProperty("ext")]
+    public string Ext { get; set; } = string.Empty;
 }

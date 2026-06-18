@@ -82,6 +82,8 @@ Once you have your **Base URL**, **Client ID**, and **Client Secret**, you are r
 
 - **Upload file**: Uploads a file and attaches it to a task or project.
 - **Download document**: Downloads a document by its ID.
+- **Search task documents**: Search documents for a specific task.
+- **Search project documents**: Search documents for the entire specific project.
 
 ### Custom fields
 
