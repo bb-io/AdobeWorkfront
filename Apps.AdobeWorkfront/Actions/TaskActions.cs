@@ -1,5 +1,6 @@
 ﻿using Apps.AdobeWorkfront.Constants;
 using Apps.AdobeWorkfront.Models.Dtos;
+using Apps.AdobeWorkfront.Models.Dtos.Task;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Utils;
@@ -31,17 +32,34 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     }
     
     [Action("Get task", Description = "Retrieve a specific task by its ID")]
-    public async Task<TaskResponse> GetTask([ActionParameter] TaskRequest taskRequest)
+    public async Task<TaskDto> GetTask([ActionParameter] TaskRequest taskRequest)
     {
         var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}");
         apiRequest.AddQueryParameter("fields", TaskFields);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
-        return response.Data;
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<GetTaskResponse>>(apiRequest);
+        var task = response.Data;
+
+        if (task.Documents is null || !task.Documents.Any())
+            return new(task);
+        
+        var documentTasks = task.Documents.Select(async doc =>
+        {
+            var docRequest = new RestRequest($"/attask/api/v19.0/docu/{doc.DocumentId}");
+            docRequest.AddQueryParameter("fields", "name,downloadURL,currentVersion:ext");
+
+            var docResponse = await Client.ExecuteWithErrorHandling<DataWrapperDto<DocumentResponse>>(docRequest);
+            var fullDoc = docResponse.Data;
+
+            return fullDoc;
+        });
+
+        task.Documents = await Task.WhenAll(documentTasks);
+        return new(task);
     }
     
     [Action("Create task", Description = "Create a new task")]
-    public async Task<TaskResponse> CreateTask([ActionParameter] CreateTaskRequest createRequest)
+    public async Task<TaskDto> CreateTask([ActionParameter] CreateTaskRequest createRequest)
     {
         var apiRequest = new RestRequest("/attask/api/v19.0/task", Method.Post)
             .AddQueryParameter("projectID", createRequest.ProjectId)
