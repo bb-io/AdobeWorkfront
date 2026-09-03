@@ -18,6 +18,8 @@ public class TokenErrorDto
     
     public override string ToString()
     {
-        return $"({StatusCode}) {Type}: {Message}";
+        string statusCodePart = StatusCode == 0 ? string.Empty : $"({StatusCode}) ";
+        
+        return $"{statusCodePart}{Type}: {Message}";
     }
 }
