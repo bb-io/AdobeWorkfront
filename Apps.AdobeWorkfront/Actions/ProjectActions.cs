@@ -24,8 +24,8 @@ public class ProjectActions(InvocationContext invocationContext) : Invocable(inv
         
         apiRequest.AddQueryParameter("fields", ProjectFields);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<ProjectWithTasksResponse>>>(apiRequest);
-        return new(response.Data);
+        var response = await Client.Paginate<ProjectWithTasksResponse>(apiRequest);
+        return new(response);
     }
     
     [Action("Get project", Description = "Retrieve details of a specific project by its ID")]
