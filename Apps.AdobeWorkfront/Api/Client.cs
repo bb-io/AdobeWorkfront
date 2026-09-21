@@ -1,4 +1,3 @@
-using System.Net;
 using Apps.AdobeWorkfront.Models.Dtos;
 using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
@@ -21,22 +20,30 @@ public class Client : BlackBirdRestClient
 
     protected override Exception ConfigureErrorException(RestResponse response)
     {
+        string statusCodePart = $"Got an error with status code: {response.StatusCode}";
+        
         if (string.IsNullOrEmpty(response.Content))
         {
-            if (string.IsNullOrEmpty(response.ErrorMessage))
-            {
-                return new PluginApplicationException($"Got an error with status code: {response.StatusCode}");
-            }
-
-            return new PluginApplicationException(response.ErrorMessage);
+            return string.IsNullOrEmpty(response.ErrorMessage)
+                ? new PluginApplicationException(statusCodePart) 
+                : new PluginApplicationException(response.ErrorMessage);
         }
         
-        if(response.ContentType == "text/html")
+        string rawResponse = response.Content[..Math.Min(response.Content.Length, 300)];
+        
+        try
         {
-            return new PluginApplicationException($"Got an error with status code: {response.StatusCode} and content: {response.Content}");
+            var errorResponse = JsonConvert.DeserializeObject<ErrorWrapperDto>(response.Content);
+            string? errorMessage = errorResponse?.ExtractErrorMessage();
+
+            if (errorResponse is null || string.IsNullOrWhiteSpace(errorMessage))
+                return new PluginApplicationException($"{statusCodePart} - couldn't deserialize a JSON error. Raw: {rawResponse}");
+
+            return new PluginApplicationException(errorMessage);
         }
-        
-        var errorResponse = JsonConvert.DeserializeObject<ErrorWrapperDto>(response.Content!)!;
-        return new PluginApplicationException(errorResponse.ToString());
+        catch (JsonException)
+        {
+            return new PluginApplicationException($"{statusCodePart} and content: {rawResponse}");
+        }
     }
 }
