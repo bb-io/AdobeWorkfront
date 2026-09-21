@@ -2,14 +2,28 @@
 
 namespace Apps.AdobeWorkfront.Models.Dtos;
 
+// Has multiple schemas
+// Example: {"title": "403 Forbidden", "description": "User is not an admin"}
 public class ErrorWrapperDto
 {
-    [JsonProperty("error")]
-    public ErrorDto Error { get; set; } = new();
+    [JsonProperty("title")]
+    public string? Title { get; set; }
+
+    [JsonProperty("description")]
+    public string? Description { get; set; }
     
-    public override string ToString()
+    [JsonProperty("error")]
+    public ErrorDto? Error { get; set; }
+    
+    public string? ExtractErrorMessage()
     {
-        return Error.ToString();
+        string? errorMessage = Error?.ToString();
+        if (!string.IsNullOrWhiteSpace(errorMessage))
+            return errorMessage;
+
+        return !string.IsNullOrWhiteSpace(Title) 
+            ? $"{Title.TrimEnd('.')}. {Description}".TrimEnd() 
+            : null;
     }
 }
 

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Apps.AdobeWorkfront.Actions;
 using Apps.AdobeWorkfront.Models.Requests;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -19,9 +18,8 @@ public class TaskActionsTests : TestBase
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Tasks);
-        Assert.IsTrue(result.Tasks.Any());
-
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        Assert.IsTrue(result.Tasks.Count != 0);
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -35,7 +33,7 @@ public class TaskActionsTests : TestBase
         Assert.IsNotNull(result);
         Assert.AreEqual(validTaskId, result.TaskId);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -73,7 +71,7 @@ public class TaskActionsTests : TestBase
         Assert.AreEqual(createRequest.Name, result.Name);
         Assert.AreEqual(createRequest.Priority, result.Priority);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -96,6 +94,6 @@ public class TaskActionsTests : TestBase
         Assert.AreEqual(updateRequest.Status, result.Status);
         Assert.AreEqual(updateRequest.Priority, result.Priority);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
 }

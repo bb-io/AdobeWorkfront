@@ -92,6 +92,8 @@ Once you have your **Base URL**, **Client ID**, and **Client Secret**, you are r
 
 ## Events
 
+> ⚠️ Important: Grant the user admin rights in order to use these events. Otherwise, you won't be able to publish a bird.
+
 ### Projects
 
 - **On project created**: Triggered when a new project is created.

@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Apps.AdobeWorkfront.Actions;
+﻿using Apps.AdobeWorkfront.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Tests.AdobeWorkfront.Base;
@@ -18,9 +17,9 @@ public class ProjectActionsTests : TestBase
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Projects);
-        Assert.IsTrue(result.Projects.Any());
-
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        Assert.IsTrue(result.Projects.Count != 0);
+        
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -35,9 +34,9 @@ public class ProjectActionsTests : TestBase
 
         Assert.IsNotNull(result);
         Assert.IsNotNull(result.Projects);
-        Assert.IsTrue(result.Projects.Any());
-
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        Assert.IsTrue(result.Projects.Count != 0);
+        
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -51,7 +50,7 @@ public class ProjectActionsTests : TestBase
         Assert.IsNotNull(result);
         Assert.AreEqual(validProjectId, result.ProjectId);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -88,7 +87,7 @@ public class ProjectActionsTests : TestBase
         Assert.IsNotNull(result);
         Assert.AreEqual(newProjectName, result.Name);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
     
     [TestMethod]
@@ -109,7 +108,7 @@ public class ProjectActionsTests : TestBase
         Assert.IsNotNull(result);
         Assert.AreEqual(updatedProjectName, result.Name);
 
-        Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }));
+        PrintResult(result);
     }
     
     [TestMethod]
