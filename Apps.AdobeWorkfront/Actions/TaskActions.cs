@@ -20,15 +20,14 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)
     {
-        
         var apiRequest = new RestRequest("/attask/api/v19.0/task/search");
         var parameters = request.GetFilterQueryParameters();
         apiRequest.ApplyToRequest(parameters);
         
         apiRequest.AddQueryParameter("fields", TaskFields);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<TaskResponse>>>(apiRequest);
-        return new(response.Data);
+        var response = await Client.Paginate<TaskResponse>(apiRequest);
+        return new(response);
     }
     
     [Action("Get task", Description = "Retrieve a specific task by its ID")]

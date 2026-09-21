@@ -18,6 +18,34 @@ public class Client : BlackBirdRestClient
         this.AddDefaultHeader(credentialsProviders.GetTokenType(), credentialsProviders.GetAccessToken());
     }
 
+    public async Task<List<T>> Paginate<T>(RestRequest request)
+    {
+        const int limit = 100;
+        int offset = 0;
+
+        // https://experienceleague.adobe.com/en/docs/workfront/using/adobe-workfront-api/api-general-information/api-basics#using-paginated-responses
+        // "To make sure your results are properly paginated, use a sorting parameter.
+        // This allows the results to be returned in the same order, so that the pagination does not repeat or skip results"
+        if (request.Parameters.All(p => p.Name?.EndsWith("_Sort", StringComparison.Ordinal) != true))
+            request.AddQueryParameter("ID_Sort", "asc");
+
+        var results = new List<T>();
+
+        while (true)
+        {
+            request.AddOrUpdateParameter("$$LIMIT", limit);
+            request.AddOrUpdateParameter("$$FIRST", offset);
+
+            var response = await ExecuteWithErrorHandling<DataWrapperDto<List<T>>>(request);
+            results.AddRange(response.Data);
+
+            if (response.Data.Count < limit)
+                return results;
+
+            offset += limit;
+        }
+    }
+
     protected override Exception ConfigureErrorException(RestResponse response)
     {
         string statusCodePart = $"Got an error with status code: {response.StatusCode}";
