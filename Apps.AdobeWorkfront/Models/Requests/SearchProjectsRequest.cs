@@ -1,6 +1,6 @@
-﻿using Apps.AdobeWorkfront.Constants;
-using Apps.AdobeWorkfront.Handlers.Static;
+﻿using Apps.AdobeWorkfront.Handlers.Static;
 using Apps.AdobeWorkfront.Models.Entities;
+using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
 
@@ -34,38 +34,11 @@ public class SearchProjectsRequest
 
     public List<QueryParameter> GetFilterQueryParameters()
     {
-        var result = new List<QueryParameter>();
-
-        void AddIf(string key, string? value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                result.Add(new QueryParameter(key, value!));
-            }
-        }
-
-        void AddRangeFilter(string field, DateTimeOffset? from, DateTimeOffset? to)
-        {
-            if (from is { } f)
-            {
-                result.Add(new QueryParameter(field, f.ToString(DateTimeFormats.Fmt)));
-                result.Add(new QueryParameter($"{field}_Mod", "gte"));
-            }
-
-            if (to is { } t)
-            {
-                result.Add(new QueryParameter(field, t.ToString(DateTimeFormats.Fmt)));
-                result.Add(new QueryParameter($"{field}_Mod", "lte"));
-            }
-        }
-
-        AddIf("name", Name);
-        AddIf("status", Status);
-
-        AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo);
-        AddRangeFilter("plannedCompletionDate", PlannedCompletionDateFrom, PlannedCompletionDateTo);
-        AddRangeFilter("projectedCompletionDate",ProjectedCompletionDateFrom, ProjectedCompletionDateTo);
-
-        return result;
+        return new List<QueryParameter>()
+            .AddIfFilter("name", Name)
+            .AddIfFilter("status", Status)
+            .AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo)
+            .AddRangeFilter("plannedCompletionDate", PlannedCompletionDateFrom, PlannedCompletionDateTo)
+            .AddRangeFilter("projectedCompletionDate", ProjectedCompletionDateFrom, ProjectedCompletionDateTo);
     }
 }
