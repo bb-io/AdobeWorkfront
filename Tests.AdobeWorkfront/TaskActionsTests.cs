@@ -23,6 +23,26 @@ public class TaskActionsTests : TestBase
     }
     
     [TestMethod]
+    public async Task SearchTasks_WithFilters_ShouldReturnTasks()
+    {
+        // Arrange
+        var taskActions = new TaskActions(InvocationContext);
+        var searchInput = new SearchTasksRequest
+        {
+            EntryDateFrom = new DateTime(2025, 09, 03, 9, 0, 0, DateTimeKind.Local),
+            EntryDateTo = new DateTime(2025, 09, 03, 10, 0, 0, DateTimeKind.Local),
+        };
+
+        // Act
+        var result = await taskActions.SearchTasks(searchInput);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.Tasks);
+        PrintResult(result);
+    }
+    
+    [TestMethod]
     public async Task GetTask_WithValidId_ShouldReturnTask()
     {
         var taskActions = new TaskActions(InvocationContext);
