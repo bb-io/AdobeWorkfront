@@ -31,6 +31,7 @@ public class TaskActionsTests : TestBase
         {
             EntryDateFrom = new DateTime(2025, 09, 03, 9, 0, 0, DateTimeKind.Local),
             EntryDateTo = new DateTime(2025, 09, 03, 10, 0, 0, DateTimeKind.Local),
+            NameContainsInsensitive = "Unit",
         };
 
         // Act

@@ -13,6 +13,23 @@ public static class FilterHelper
         return result;
     }
     
+    public static List<QueryParameter> AddContainsFilter(
+        this List<QueryParameter> result, 
+        string key, 
+        string? value,
+        bool caseSensitive = true)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return result;
+        
+        result.Add(new QueryParameter(key, value));
+        result.Add(caseSensitive
+            ? new QueryParameter($"{key}_Mod", "contains")
+            : new QueryParameter($"{key}_Mod", "cicontains"));
+
+        return result;
+    }
+    
     public static List<QueryParameter> AddRangeFilter(
         this List<QueryParameter> result, 
         string field, 

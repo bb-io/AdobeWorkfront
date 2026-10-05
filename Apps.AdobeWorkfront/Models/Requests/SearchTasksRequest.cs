@@ -8,8 +8,14 @@ namespace Apps.AdobeWorkfront.Models.Requests;
 
 public class SearchTasksRequest
 {
-    [Display("Task name")]
+    [Display("Task name equals")]
     public string? Name { get; set; }
+
+    [Display("Task name contains (case-sensitive)")]
+    public string? NameContainsSensitive { get; set; }
+
+    [Display("Task name contains (case-insensitive)")]
+    public string? NameContainsInsensitive { get; set; }
     
     [Display("Task status"), StaticDataSource(typeof(TaskStatusDataHandler))]
     public string? Status { get; set; }
@@ -45,6 +51,8 @@ public class SearchTasksRequest
     {
         return new List<QueryParameter>()
             .AddIfFilter("name", Name)
+            .AddContainsFilter("name", NameContainsSensitive, caseSensitive: true)
+            .AddContainsFilter("name", NameContainsInsensitive, caseSensitive: false)
             .AddIfFilter("status", Status)
             .AddIfFilter("progressStatus", ProgressStatus)
             .AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo)
