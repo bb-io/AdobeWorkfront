@@ -31,12 +31,18 @@ public class SearchTasksRequest
 
     [Display("Parent task ID"), DataSource(typeof(TaskDataHandler))]
     public string? ParentId { get; set; }
+
+    [Display("Project ID"), DataSource(typeof(ProjectDataHandler))]
+    public string? ProjectId { get; set; }
     
     [Display("Task status"), StaticDataSource(typeof(TaskStatusDataHandler))]
     public string? Status { get; set; }
     
     [Display("Progress status"), StaticDataSource(typeof(ProgressStatusDataHandler))]
     public string? ProgressStatus { get; set; }
+
+    [Display("Entered by user ID"), DataSource(typeof(UserDataHandler))]
+    public string? EnteredByUserId { get; set; }
 
     [Display("Planned completion date from")]
     public DateTime? PlannedCompletionDateFrom { get; set; }
@@ -62,8 +68,20 @@ public class SearchTasksRequest
     [Display("Entry date to")]
     public DateTime? EntryDateTo { get; set; }
 
+    [Display("Percent complete from")]
+    public int? PercentCompleteFrom { get; set; }
+
+    [Display("Percent complete to")]
+    public int? PercentCompleteTo { get; set; }
+
+    [Display("Raw query", Description = "Extra filters not covered by the inputs above, e.g. priority=2&priority_Mod=gte")]
+    public string? RawQuery { get; set; }
+
     public void Validate()
     {
+        if (PercentCompleteFrom.HasValue && PercentCompleteTo.HasValue && PercentCompleteFrom > PercentCompleteTo)
+            throw new PluginMisconfigurationException("'Percent complete from' value can't be more than 'Percent complete to'");
+        
         int taskNameInputs = new[] { Name, NameContainsInsensitive, NameContainsSensitive }
             .Count(x => !string.IsNullOrWhiteSpace(x));
         if (taskNameInputs > 1)
@@ -85,11 +103,15 @@ public class SearchTasksRequest
             .AddEqualsFilter("parent:name", ParentName)
             .AddContainsFilter("parent:name", ParentNameContainsSensitive, caseSensitive: true)
             .AddContainsFilter("parent:name", ParentNameContainsInsensitive, caseSensitive: false)
+            .AddEqualsFilter("projectID", ProjectId)
             .AddEqualsFilter("status", Status)
             .AddEqualsFilter("progressStatus", ProgressStatus)
+            .AddEqualsFilter("enteredByID", EnteredByUserId)
             .AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo)
             .AddRangeFilter("plannedCompletionDate", PlannedCompletionDateFrom, PlannedCompletionDateTo)
             .AddRangeFilter("projectedCompletionDate", ProjectedCompletionDateFrom, ProjectedCompletionDateTo)
-            .AddRangeFilter("entryDate", EntryDateFrom, EntryDateTo);
+            .AddRangeFilter("entryDate", EntryDateFrom, EntryDateTo)
+            .AddRangeFilter("percentComplete", PercentCompleteFrom, PercentCompleteTo)
+            .AddRawQuery(RawQuery);
     }
 }

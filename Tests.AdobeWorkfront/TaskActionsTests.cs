@@ -29,9 +29,9 @@ public class TaskActionsTests : TestBase
         var taskActions = new TaskActions(InvocationContext);
         var searchInput = new SearchTasksRequest
         {
-            EntryDateFrom = new DateTime(2025, 09, 03, 9, 0, 0, DateTimeKind.Local),
-            EntryDateTo = new DateTime(2025, 09, 03, 10, 0, 0, DateTimeKind.Local),
-            NameContainsInsensitive = "Unit",
+            ProjectId = "68b16191000205545ecdee7125a2900c",
+            RawQuery = "taskNumber=5&taskNumber_Mod=gte",
+            NameContainsSensitive = "blue"
         };
 
         // Act
