@@ -20,6 +20,8 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)
     {
+        request.Validate();
+        
         var apiRequest = new RestRequest("/attask/api/v19.0/task/search");
         var parameters = request.GetFilterQueryParameters();
         apiRequest.ApplyToRequest(parameters);

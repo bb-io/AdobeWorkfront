@@ -1,8 +1,11 @@
-﻿using Apps.AdobeWorkfront.Handlers.Static;
+﻿using Apps.AdobeWorkfront.Handlers;
+using Apps.AdobeWorkfront.Handlers.Static;
 using Apps.AdobeWorkfront.Models.Entities;
 using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Dictionaries;
+using Blackbird.Applications.Sdk.Common.Dynamic;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 
 namespace Apps.AdobeWorkfront.Models.Requests;
 
@@ -16,6 +19,18 @@ public class SearchTasksRequest
 
     [Display("Task name contains (case-insensitive)")]
     public string? NameContainsInsensitive { get; set; }
+
+    [Display("Parent task name equals")]
+    public string? ParentName { get; set; }
+
+    [Display("Parent task name contains (case-sensitive)")]
+    public string? ParentNameContainsSensitive { get; set; }
+
+    [Display("Parent task name contains (case-insensitive)")]
+    public string? ParentNameContainsInsensitive { get; set; }
+
+    [Display("Parent task ID"), DataSource(typeof(TaskDataHandler))]
+    public string? ParentId { get; set; }
     
     [Display("Task status"), StaticDataSource(typeof(TaskStatusDataHandler))]
     public string? Status { get; set; }
@@ -47,12 +62,29 @@ public class SearchTasksRequest
     [Display("Entry date to")]
     public DateTime? EntryDateTo { get; set; }
 
+    public void Validate()
+    {
+        int taskNameInputs = new[] { Name, NameContainsInsensitive, NameContainsSensitive }
+            .Count(x => !string.IsNullOrWhiteSpace(x));
+        if (taskNameInputs > 1)
+            throw new PluginMisconfigurationException("Only one Task name input is allowed");
+        
+        int parentNameInputs = new[] { ParentId, ParentName, ParentNameContainsInsensitive, ParentNameContainsSensitive }
+            .Count(x => !string.IsNullOrWhiteSpace(x));
+        if (parentNameInputs > 1)
+            throw new PluginMisconfigurationException("Only one Parent task input is allowed");
+    }
+
     public List<QueryParameter> GetFilterQueryParameters()
     {
         return new List<QueryParameter>()
             .AddEqualsFilter("name", Name)
             .AddContainsFilter("name", NameContainsSensitive, caseSensitive: true)
             .AddContainsFilter("name", NameContainsInsensitive, caseSensitive: false)
+            .AddEqualsFilter("parentID", ParentId)
+            .AddEqualsFilter("parent:name", ParentName)
+            .AddContainsFilter("parent:name", ParentNameContainsSensitive, caseSensitive: true)
+            .AddContainsFilter("parent:name", ParentNameContainsInsensitive, caseSensitive: false)
             .AddEqualsFilter("status", Status)
             .AddEqualsFilter("progressStatus", ProgressStatus)
             .AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo)
