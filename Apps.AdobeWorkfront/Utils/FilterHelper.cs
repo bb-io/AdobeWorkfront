@@ -5,7 +5,7 @@ namespace Apps.AdobeWorkfront.Utils;
 
 public static class FilterHelper
 {
-    public static List<QueryParameter> AddIfFilter(this List<QueryParameter> result, string key, string? value)
+    public static List<QueryParameter> AddEqualsFilter(this List<QueryParameter> result, string key, string? value)
     {
         if (!string.IsNullOrWhiteSpace(value))
             result.Add(new QueryParameter(key, value));
