@@ -11,7 +11,7 @@ public class CustomFieldDataHandlerTests : BaseDataHandlerTests
     protected override IAsyncDataSourceItemHandler DataHandler => new CustomFieldDataHandler(InvocationContext, new()
     {
         ParentType = "TASK",
-        ParentId = "68b943890000b3f9a2461de5fe76b61b"
+        ParentId = "6ac3a65c0005a2b6bf939413f6ae5151"
     });
 
     protected override string SearchString => "custom";
