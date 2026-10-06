@@ -1,40 +1,17 @@
-﻿using System.Globalization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Apps.AdobeWorkfront.Utils.Converters;
 
 public class WorkfrontDateTimeConverter : JsonConverter<DateTime?>
 {
-    private static readonly string[] Formats =
-    [
-        "yyyy-MM-ddTHH:mm:ss:fffzzz",
-        "yyyy-MM-ddTHH:mm:ss.fffzzz",
-        "dd.MM.yyyy HH:mm:ss"
-    ];
-
-    public override DateTime? ReadJson(JsonReader reader, Type objectType, DateTime? existingValue, bool hasExistingValue,
+    public override DateTime? ReadJson(
+        JsonReader reader, 
+        Type objectType, 
+        DateTime? existingValue, 
+        bool hasExistingValue,
         JsonSerializer serializer)
     {
-        try
-        {
-            var raw = reader.Value?.ToString();
-            if (string.IsNullOrEmpty(raw))
-            {
-                return default;
-            }
-
-            if (DateTime.TryParseExact(raw, Formats, CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind, out var parsed))
-            {
-                return parsed;
-            }
-
-            return default;
-        }
-        catch
-        {
-            return default;
-        }
+        return WorkfrontDateTime.TryParse(reader.Value?.ToString(), out var parsed) ? parsed : default;
     }
 
     public override void WriteJson(JsonWriter writer, DateTime? value, JsonSerializer serializer)

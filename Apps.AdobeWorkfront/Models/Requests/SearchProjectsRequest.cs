@@ -35,8 +35,8 @@ public class SearchProjectsRequest
     public List<QueryParameter> GetFilterQueryParameters()
     {
         return new List<QueryParameter>()
-            .AddIfFilter("name", Name)
-            .AddIfFilter("status", Status)
+            .AddEqualsFilter("name", Name)
+            .AddEqualsFilter("status", Status)
             .AddRangeFilter("plannedStartDate", PlannedStartDateFrom, PlannedStartDateTo)
             .AddRangeFilter("plannedCompletionDate", PlannedCompletionDateFrom, PlannedCompletionDateTo)
             .AddRangeFilter("projectedCompletionDate", ProjectedCompletionDateFrom, ProjectedCompletionDateTo);

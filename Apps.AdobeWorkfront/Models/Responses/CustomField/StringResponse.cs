@@ -1,6 +1,6 @@
 ﻿using Blackbird.Applications.Sdk.Common;
 
-namespace Apps.AdobeWorkfront.Models.Responses;
+namespace Apps.AdobeWorkfront.Models.Responses.CustomField;
 
 public class StringResponse(string customFieldValue)
 {

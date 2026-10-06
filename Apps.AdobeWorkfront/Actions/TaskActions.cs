@@ -1,8 +1,10 @@
 ﻿using Apps.AdobeWorkfront.Constants;
 using Apps.AdobeWorkfront.Models.Dtos;
-using Apps.AdobeWorkfront.Models.Dtos.Task;
+using Apps.AdobeWorkfront.Models.Entities.Document;
+using Apps.AdobeWorkfront.Models.Entities.Task;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
+using Apps.AdobeWorkfront.Models.Responses.Task;
 using Apps.AdobeWorkfront.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
@@ -15,28 +17,29 @@ namespace Apps.AdobeWorkfront.Actions;
 [ActionList("Tasks")]
 public class TaskActions(InvocationContext invocationContext) : Invocable(invocationContext)
 {
-    private const string TaskFields = Fields.TaskFields;
+    private readonly string _taskFields = Fields.TaskFields;
     
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)
     {
-        var apiRequest = new RestRequest("/attask/api/v19.0/task/search");
+        request.Validate();
         var parameters = request.GetFilterQueryParameters();
-        apiRequest.ApplyToRequest(parameters);
         
-        apiRequest.AddQueryParameter("fields", TaskFields);
+        var apiRequest = new RestRequest("/attask/api/v19.0/task/search")
+            .ApplyToRequest(parameters)
+            .AddQueryParameter("fields", _taskFields);
         
-        var response = await Client.Paginate<TaskResponse>(apiRequest);
-        return new(response);
+        var response = await Client.Paginate<TaskFullEntity>(apiRequest);
+        return new(response.Select(x => new TaskResponse(x)).ToList());
     }
     
     [Action("Get task", Description = "Retrieve a specific task by its ID")]
-    public async Task<TaskDto> GetTask([ActionParameter] TaskRequest taskRequest)
+    public async Task<TaskWithDocumentsResponse> GetTask([ActionParameter] TaskRequest taskRequest)
     {
         var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}");
-        apiRequest.AddQueryParameter("fields", TaskFields);
+        apiRequest.AddQueryParameter("fields", _taskFields);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<GetTaskResponse>>(apiRequest);
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskWithDocumentsEntity>>(apiRequest);
         var task = response.Data;
 
         if (task.Documents is null || !task.Documents.Any())
@@ -47,7 +50,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
             var docRequest = new RestRequest($"/attask/api/v19.0/docu/{doc.DocumentId}");
             docRequest.AddQueryParameter("fields", "name,downloadURL,currentVersion:ext");
 
-            var docResponse = await Client.ExecuteWithErrorHandling<DataWrapperDto<DocumentResponse>>(docRequest);
+            var docResponse = await Client.ExecuteWithErrorHandling<DataWrapperDto<DocumentEntity>>(docRequest);
             var fullDoc = docResponse.Data;
 
             return fullDoc;
@@ -58,7 +61,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     }
     
     [Action("Create task", Description = "Create a new task")]
-    public async Task<TaskDto> CreateTask([ActionParameter] CreateTaskRequest createRequest)
+    public async Task<TaskWithDocumentsResponse> CreateTask([ActionParameter] CreateTaskRequest createRequest)
     {
         var apiRequest = new RestRequest("/attask/api/v19.0/task", Method.Post)
             .AddQueryParameter("projectID", createRequest.ProjectId)
@@ -69,7 +72,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
             apiRequest.AddQueryParameter("priority", createRequest.Priority.Value);
         }
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskBasicEntity>>(apiRequest);
         if (createRequest.AssigneeIds != null)
         {
             await AssignUsersToTask(response.Data.TaskId, createRequest.AssigneeIds);
@@ -104,14 +107,14 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
             apiRequest.AddQueryParameter("percentComplete", updateRequest.PercentComplete.Value);
         }
         
-        apiRequest.AddQueryParameter("fields", TaskFields);
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
+        apiRequest.AddQueryParameter("fields", _taskFields);
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskFullEntity>>(apiRequest);
         if (updateRequest.AssigneeIds != null)
         {
             await AssignUsersToTask(response.Data.TaskId, updateRequest.AssigneeIds);
         }
         
-        return response.Data;
+        return new(response.Data);
     }
     
     [Action("Delete task", Description = "Delete a task by its ID")]

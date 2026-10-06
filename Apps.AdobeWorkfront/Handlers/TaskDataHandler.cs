@@ -1,5 +1,5 @@
 ﻿using Apps.AdobeWorkfront.Models.Dtos;
-using Apps.AdobeWorkfront.Models.Responses;
+using Apps.AdobeWorkfront.Models.Entities.Task;
 using Blackbird.Applications.Sdk.Common.Dynamic;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using RestSharp;
@@ -19,7 +19,7 @@ public class TaskDataHandler(InvocationContext invocationContext)
             apiRequest.AddQueryParameter("name_Mod", "contains");
         }
 
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<TaskResponse>>>(apiRequest);
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<List<TaskBasicEntity>>>(apiRequest);
         return response.Data.Select(x => new DataSourceItem(x.TaskId, x.Name));
     }
 }

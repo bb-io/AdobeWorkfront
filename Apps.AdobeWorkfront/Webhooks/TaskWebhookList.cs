@@ -1,5 +1,6 @@
 ﻿using Apps.AdobeWorkfront.Constants;
 using Apps.AdobeWorkfront.Models.Dtos;
+using Apps.AdobeWorkfront.Models.Entities.Task;
 using Apps.AdobeWorkfront.Models.Requests;
 using Apps.AdobeWorkfront.Models.Responses;
 using Apps.AdobeWorkfront.Webhooks.Handlers.TaskHandlers;
@@ -46,8 +47,8 @@ public class TaskWebhookList(InvocationContext invocationContext) : BaseWebhookL
         var apiRequest = new RestRequest($"/attask/api/v19.0/task/{webhookResponse.Result.TaskId}")
             .AddQueryParameter("fields", Fields.TaskFields);
         
-        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskResponse>>(apiRequest);
-        webhookResponse.Result.ProjectName = response.Data.ProjectName;
+        var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskFullEntity>>(apiRequest);
+        webhookResponse.Result.ProjectName = response.Data.Project.Name;
 
         return webhookResponse;
     }
