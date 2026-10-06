@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Apps.AdobeWorkfront.Models.Responses;
 
-public class TaskSmallResponse : BaseResponse
+public class TaskSmallResponse
 {
     [Display("Task ID"), JsonProperty("ID")]
     public string TaskId { get; set; } = string.Empty;
@@ -22,9 +22,4 @@ public class TaskSmallResponse : BaseResponse
     
     [Display("Assigned to names"), JsonProperty("assignmentsListString")]
     public string? AssignedToNames { get; set; }
-
-    public override string GetId()
-    {
-        return TaskId;
-    }
 }

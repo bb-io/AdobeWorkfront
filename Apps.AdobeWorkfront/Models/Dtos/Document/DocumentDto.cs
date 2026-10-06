@@ -1,3 +1,4 @@
+using Apps.AdobeWorkfront.Models.Entities.Document;
 using Apps.AdobeWorkfront.Models.Responses;
 using Blackbird.Applications.Sdk.Common;
 
@@ -6,11 +7,17 @@ namespace Apps.AdobeWorkfront.Models.Dtos.Document;
 public record DocumentDto
 {
     public DocumentDto(DocumentResponse response)
+        : this(response.DocumentId, response.Name, response.DownloadUrl, response.CurrentVersion?.Ext) { }
+
+    public DocumentDto(DocumentEntity entity)
+        : this(entity.DocumentId, entity.Name, entity.DownloadUrl, entity.CurrentVersion?.Ext) { }
+
+    private DocumentDto(string documentId, string name, string downloadUrl, string? fileExtension)
     {
-        DocumentId = response.DocumentId;
-        Name = response.Name;
-        DownloadUrl = response.DownloadUrl;
-        FileExtension = response.CurrentVersion.Ext;
+        DocumentId = documentId;
+        Name = name;
+        DownloadUrl = downloadUrl;
+        FileExtension = fileExtension ?? string.Empty;
     }
     
     [Display("Document ID")]
