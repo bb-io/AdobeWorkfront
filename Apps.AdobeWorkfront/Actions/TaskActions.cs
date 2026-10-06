@@ -17,18 +17,17 @@ namespace Apps.AdobeWorkfront.Actions;
 [ActionList("Tasks")]
 public class TaskActions(InvocationContext invocationContext) : Invocable(invocationContext)
 {
-    private const string TaskFields = Fields.TaskFields;
+    private readonly string _taskFields = Fields.TaskFields;
     
     [Action("Search tasks", Description = "Retrieve a list of tasks based on search criteria")]
     public async Task<SearchTasksResponse> SearchTasks([ActionParameter] SearchTasksRequest request)
     {
         request.Validate();
-        
-        var apiRequest = new RestRequest("/attask/api/v19.0/task/search");
         var parameters = request.GetFilterQueryParameters();
-        apiRequest.ApplyToRequest(parameters);
         
-        apiRequest.AddQueryParameter("fields", TaskFields);
+        var apiRequest = new RestRequest("/attask/api/v19.0/task/search")
+            .ApplyToRequest(parameters)
+            .AddQueryParameter("fields", _taskFields);
         
         var response = await Client.Paginate<TaskFullEntity>(apiRequest);
         return new(response.Select(x => new TaskResponse(x)).ToList());
@@ -38,7 +37,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
     public async Task<TaskWithDocumentsResponse> GetTask([ActionParameter] TaskRequest taskRequest)
     {
         var apiRequest = new RestRequest($"/attask/api/v19.0/task/{taskRequest.TaskId}");
-        apiRequest.AddQueryParameter("fields", TaskFields);
+        apiRequest.AddQueryParameter("fields", _taskFields);
         
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskWithDocumentsEntity>>(apiRequest);
         var task = response.Data;
@@ -108,7 +107,7 @@ public class TaskActions(InvocationContext invocationContext) : Invocable(invoca
             apiRequest.AddQueryParameter("percentComplete", updateRequest.PercentComplete.Value);
         }
         
-        apiRequest.AddQueryParameter("fields", TaskFields);
+        apiRequest.AddQueryParameter("fields", _taskFields);
         var response = await Client.ExecuteWithErrorHandling<DataWrapperDto<TaskFullEntity>>(apiRequest);
         if (updateRequest.AssigneeIds != null)
         {

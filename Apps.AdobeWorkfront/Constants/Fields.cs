@@ -2,29 +2,33 @@
 
 public static class Fields
 {
-    public const string TaskFields =
-        "percentComplete," +
-        "plannedCompletionDate," +
-        "plannedStartDate," +
-        "priority," +
-        "progressStatus," +
-        "projectedCompletionDate," +
-        "projectedStartDate," +
-        "status," +
-        "taskNumber," +
-        "wbs," +
-        "assignmentsListString," +
-        "assignedToID," +
-        "parentID," +
-        "parent:name," +
-        "description," +
-        "projectID," +
-        "project:name," +
-        "documents:ID," +
-        "documents:name," +
-        "documents:currentVersion:ext," +
-        "enteredByID," +
-        "enteredBy:name," +
-        "enteredBy:emailAddr," +
-        "parameterValues:*";
+    private static readonly string[] TaskFieldNames = new[]
+    {
+        "percentComplete",
+        "plannedCompletionDate", 
+        "plannedStartDate", 
+        "priority", 
+        "progressStatus", 
+        "projectedCompletionDate", 
+        "projectedStartDate", 
+        "status", 
+        "taskNumber", 
+        "wbs", 
+        "assignmentsListString", 
+        "assignedToID",
+        "parentID",
+        "parent:name", 
+        "description", 
+        "projectID",
+        "project:name",
+        "documents:ID", 
+        "documents:name", 
+        "documents:currentVersion:ext", 
+        "enteredByID", 
+        "enteredBy:name", 
+        "enteredBy:emailAddr",
+        "parameterValues:*"
+    };
+
+    public static readonly string TaskFields = string.Join(',', TaskFieldNames);
 }
