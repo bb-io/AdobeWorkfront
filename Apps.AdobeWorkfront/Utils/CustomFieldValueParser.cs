@@ -5,6 +5,11 @@ namespace Apps.AdobeWorkfront.Utils;
 
 public static class CustomFieldValueParser
 {
+    public static string ToText(object? raw)
+    {
+        return string.Join(", ", ToValues(raw));
+    }
+
     public static List<string> ToValues(object? raw) => raw switch
     {
         null => [],

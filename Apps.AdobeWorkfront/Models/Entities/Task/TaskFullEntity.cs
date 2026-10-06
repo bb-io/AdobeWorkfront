@@ -54,4 +54,7 @@ public class TaskFullEntity : TaskBasicEntity
 
     [JsonProperty("enteredBy")]
     public UserEntity? EnteredByUser { get; set; }
+    
+    [JsonProperty("parameterValues")]
+    public Dictionary<string, object?>? CustomFields { get; set; }
 }

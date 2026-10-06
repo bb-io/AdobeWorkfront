@@ -19,7 +19,7 @@ public class CustomFieldActions(InvocationContext invocationContext) : Invocable
     public async Task<StringResponse> GetCustomFieldValue([ActionParameter] CustomFieldRequest customFieldRequest)
     {
         var raw = await GetRawValue(customFieldRequest);
-        return new StringResponse(string.Join(", ", CustomFieldValueParser.ToValues(raw)));
+        return new StringResponse(CustomFieldValueParser.ToText(raw));
     }
     
     [Action("Get number custom field value", Description = "Get the value of a number custom field")]

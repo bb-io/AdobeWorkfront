@@ -25,5 +25,6 @@ public static class Fields
         "documents:currentVersion:ext," +
         "enteredByID," +
         "enteredBy:name," +
-        "enteredBy:emailAddr";
+        "enteredBy:emailAddr," +
+        "parameterValues:*";
 }

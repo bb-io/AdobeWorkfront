@@ -1,4 +1,5 @@
 ﻿using Apps.AdobeWorkfront.Models.Entities.Task;
+using Apps.AdobeWorkfront.Models.Responses.CustomField;
 using Apps.AdobeWorkfront.Utils.Converters;
 using Blackbird.Applications.Sdk.Common;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ public class TaskResponse : TaskSmallResponse
         EnteredByUserId = entity.EnteredByUserId;
         EnteredByUserName = entity.EnteredByUser?.Name;
         EnteredByUserEmail = entity.EnteredByUser?.Email;
+        CustomFields = entity.CustomFields?.Select(x => new CustomFieldValueResponse(x.Key, x.Value)).ToList() ?? [];
     }
     
     [JsonProperty("projectID"), Display("Project ID")]
@@ -86,4 +88,7 @@ public class TaskResponse : TaskSmallResponse
 
     [Display("Entered by user email")]
     public string? EnteredByUserEmail { get; set; }
+    
+    [Display("Custom fields")]
+    public List<CustomFieldValueResponse> CustomFields { get; set; }
 }

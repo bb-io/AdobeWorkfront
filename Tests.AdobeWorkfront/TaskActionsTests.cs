@@ -30,8 +30,7 @@ public class TaskActionsTests : TestBase
         var searchInput = new SearchTasksRequest
         {
             ProjectId = "68b16191000205545ecdee7125a2900c",
-            RawQuery = "taskNumber=5&taskNumber_Mod=gte",
-            NameContainsSensitive = "blue"
+            NameContainsSensitive = "red"
         };
 
         // Act
