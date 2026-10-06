@@ -87,8 +87,16 @@ Once you have your **Base URL**, **Client ID**, and **Client Secret**, you are r
 
 ### Custom fields
 
-- **Get string custom field value**: Returns the value of a custom field for a specific object.
+- **Get string custom field value**: Returns a string value of a custom field for a specific object.
+Multi-value fields are returned comma-separated.
+- **Get number custom field value**: Returns a number value of a custom field for a specific object.
+- **Get date custom field value**: Returns a date value of a custom field for a specific object.
+- **Get multiple values custom field value**: Returns values of a custom multi-select or checkbox field for a specific object.
 - **Set string custom field value**: Updates the value of a custom field for a specific object.
+
+### Comments
+
+- **Create comment** Creates a new comment to an existing task or project.
 
 ## Events
 
